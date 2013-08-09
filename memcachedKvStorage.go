@@ -33,9 +33,9 @@ func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
 		}
 		return nil, err
 	} else {
-		error, object := this.bytesToInterface(item)
-		if error != nil {
-			return nil, error
+		err, object := this.bytesToInterface(item)
+		if err != nil {
+			return nil, err
 		} else {
 			return object, nil
 		}
@@ -69,10 +69,10 @@ func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]in
 	cacheKeys := make([]string, len(keys))
 	for index, key := range keys {
 		cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
-		cacheKeys[index] = cacheKey
 		if err != nil {
 			return nil, err
 		}
+		cacheKeys[index] = cacheKey
 	}
 	itemMap, err := this.client.GetMulti(cacheKeys)
 	if err != nil {
@@ -80,8 +80,8 @@ func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]in
 	}
 	result := make(map[interface{}]interface{})
 	for k, item := range itemMap {
-		error, object := this.bytesToInterface(item)
-		if error != nil {
+		err, object := this.bytesToInterface(item)
+		if err != nil {
 			continue
 		}
 		result[GetRawKey(k)] = object
@@ -91,8 +91,7 @@ func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]in
 
 func (this *MemcachedKvStorage) MultiSet(objectMap map[interface{}]interface{}) error {
 	for k, v := range objectMap {
-		err := this.Set(k, v)
-		if err != nil {
+		if err := this.Set(k, v); err != nil {
 			return err
 		}
 	}
@@ -112,9 +111,10 @@ func BuildCacheKey(keyPrefix interface{}, key interface{}) (cacheKey string, err
 	if key == nil {
 		return "", errors.New("key should not be nil")
 	}
-	if reflect.TypeOf(key) != reflect.TypeOf("1") {
+	if reflect.TypeOf(key).Kind() != reflect.String {
 		return "", errors.New("key should be string")
 	}
+
 	return strings.Join([]string{keyPrefix.(string), key.(string)}, "_"), nil
 }
 
