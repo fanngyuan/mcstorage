@@ -58,8 +58,7 @@ func (this *StorageProxy) MultiGet(keys []interface{}) (map[interface{}]interfac
 	}
 	missedKeyCount := 0
 	for _, key := range keys {
-		_, find := resultMap[key]
-		if !find {
+		if _, find := resultMap[key]; !find {
 			missedKeyCount++
 		}
 	}
@@ -67,8 +66,7 @@ func (this *StorageProxy) MultiGet(keys []interface{}) (map[interface{}]interfac
 		missedKeys := make([]interface{}, missedKeyCount)
 		i := 0
 		for _, key := range keys {
-			_, find := resultMap[key]
-			if !find {
+			if _, find := resultMap[key]; !find {
 				missedKeys[i] = key
 				i++
 			}
