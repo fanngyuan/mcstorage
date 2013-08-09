@@ -28,7 +28,7 @@ func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
 	}
 	item, err := this.client.Get(cacheKey)
 	if err != nil {
-		if err.Error() == "memcache: cache miss" {
+		if err == memcache.ErrCacheMiss {
 			return nil, nil
 		}
 		return nil, err
