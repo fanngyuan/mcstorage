@@ -12,6 +12,7 @@ type T struct {
 
 func TestGetSet(t *testing.T) {
 	tt := T{1}
+
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(&tt))
 	mcStorage.Set("1", tt)
 	res, _ := mcStorage.Get("1")

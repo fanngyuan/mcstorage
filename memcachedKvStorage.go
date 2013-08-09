@@ -33,7 +33,7 @@ func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
 		}
 		return nil, err
 	} else {
-		err, object := this.bytesToInterface(item)
+		object, err := this.bytesToInterface(item)
 		if err != nil {
 			return nil, err
 		} else {
@@ -42,14 +42,14 @@ func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
 	}
 }
 
-func (this *MemcachedKvStorage) bytesToInterface(item *memcache.Item) (error, interface{}) {
+func (this *MemcachedKvStorage) bytesToInterface(item *memcache.Item) (interface{}, error) {
 	tStruct := reflect.New(this.T)
 	dec := json.NewDecoder(bytes.NewBuffer(item.Value))
 	err := dec.Decode(tStruct.Interface())
 	if err != nil {
 		return err, nil
 	}
-	return nil, tStruct.Elem().Interface()
+	return tStruct.Elem().Interface(), nil
 }
 
 func (this *MemcachedKvStorage) Set(key interface{}, object interface{}) error {
@@ -80,7 +80,7 @@ func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]in
 	}
 	result := make(map[interface{}]interface{})
 	for k, item := range itemMap {
-		err, object := this.bytesToInterface(item)
+		object, err := this.bytesToInterface(item)
 		if err != nil {
 			continue
 		}

@@ -10,7 +10,7 @@ func TestGetSetProxy(t *testing.T) {
 	tt := T{1}
 	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(&tt))
 	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(&tt))
-	storageProxy := &StorageProxy{mcStorage1, mcStorage2}
+	storageProxy := NewStorageProxy(mcStorage1, mcStorage2)
 
 	mcStorage1.Set("1", tt)
 	res, _ := storageProxy.Get("1")
