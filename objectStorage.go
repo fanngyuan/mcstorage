@@ -13,6 +13,13 @@ type StorageProxy struct {
 	BackupStorage   Storage
 }
 
+func NewStorageProxy(prefered, backup Storage) *StorageProxy {
+	return &StorageProxy{
+		PreferedStorage: prefered,
+		BackupStorage:   backup,
+	}
+}
+
 func (this *StorageProxy) Get(key interface{}) (interface{}, error) {
 	object, err := this.PreferedStorage.Get(key)
 	if err != nil {
