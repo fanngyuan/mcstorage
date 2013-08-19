@@ -17,10 +17,10 @@ func TestGetSet(t *testing.T) {
 	mcStorage.Set("1", tt)
 	res, _ := mcStorage.Get("1")
 	defer mcStorage.Delete("1")
-	if reflect.TypeOf(res) != reflect.TypeOf(&tt) {
+	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")
 	}
-	ttRes := res.(*T)
+	ttRes := res.(T)
 	if ttRes.A != tt.A {
 		t.Error("res A field is not equals tt field")
 	}
@@ -39,14 +39,14 @@ func TestMultiGetSet(t *testing.T) {
 	mcStorage.MultiSet(valueMap)
 	res, _ := mcStorage.MultiGet(keys)
 	for k, v := range res {
-		if reflect.TypeOf(v) != reflect.TypeOf(&tt) {
+		if reflect.TypeOf(v) != reflect.TypeOf(tt) {
 			t.Error("res type is not T")
 		}
 		kint, err := strconv.Atoi(k.(string))
 		if err != nil {
 			t.Error("key %s is not int ", k)
 		}
-		vT := v.(*T)
+		vT := v.(T)
 		if kint != vT.A {
 			t.Error("value should be %s,while it is %s", kint, vT.A)
 		}
@@ -58,10 +58,10 @@ func TestGetSetDelete(t *testing.T) {
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(&tt))
 	mcStorage.Set("1", tt)
 	res, _ := mcStorage.Get("1")
-	if reflect.TypeOf(res) != reflect.TypeOf(&tt) {
+	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")
 	}
-	ttRes := res.(*T)
+	ttRes := res.(T)
 	if ttRes.A != tt.A {
 		t.Error("res A field is not equals tt field")
 	}

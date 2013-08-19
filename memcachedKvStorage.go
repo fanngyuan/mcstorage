@@ -49,7 +49,7 @@ func (this *MemcachedKvStorage) bytesToInterface(item *memcache.Item) (interface
 	if err != nil {
 		return err, nil
 	}
-	return tStruct.Elem().Interface(), nil
+	return reflect.Indirect(tStruct.Elem()).Interface(), nil
 }
 
 func (this *MemcachedKvStorage) Set(key interface{}, object interface{}) error {
