@@ -8,6 +8,12 @@ type Storage interface {
 	Delete(key interface{}) error
 }
 
+type CounterStorage interface{
+	Storage
+	Incr(key interface{},step uint64)(newValue uint64, err error)
+	Decr(key interface{},step uint64)(newValue uint64, err error)
+}
+
 type StorageProxy struct {
 	PreferedStorage Storage
 	BackupStorage   Storage
