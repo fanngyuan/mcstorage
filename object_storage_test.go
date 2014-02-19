@@ -160,3 +160,33 @@ func TestDeleteProxy(t *testing.T) {
 		t.Error("res should be nil ,after delete")
 	}
 }
+
+func TestIncrDecrProxy(t *testing.T) {
+	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(1))
+	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(1))
+	storageProxy := NewStorageProxy(mcStorage1, mcStorage2)
+
+	mcStorage2.Set("1", 1)
+	res, _ := storageProxy.Get("1")
+	defer storageProxy.Delete("1")
+	if reflect.TypeOf(res) != reflect.TypeOf(1) {
+		t.Error("res type is not T")
+	}
+
+	resIncr,_:=storageProxy.Incr("1",1)
+	if reflect.TypeOf(res) != reflect.TypeOf(1) {
+		t.Error("res type is not T")
+	}
+	if resIncr!=2{
+		t.Error("value should be 2")
+	}
+
+	resDecr,_:=storageProxy.Decr("1",1)
+	if reflect.TypeOf(res) != reflect.TypeOf(1) {
+		t.Error("res type is not T")
+	}
+	if resDecr!=1{
+		t.Error("value should be 1")
+	}
+
+}

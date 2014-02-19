@@ -112,3 +112,27 @@ func (this *StorageProxy) Delete(key interface{}) error {
 	}
 	return nil
 }
+
+func (this *StorageProxy) Incr(key interface{},step uint64)(newValue uint64, err error){
+	result,err:=this.PreferedStorage.(CounterStorage).Incr(key,step)
+	if err!=nil{
+		return result,err
+	}
+	result,err=this.BackupStorage.(CounterStorage).Incr(key,step)
+	if err!=nil{
+		return result,err
+	}
+	return result,err
+}
+
+func (this *StorageProxy) Decr(key interface{},step uint64)(newValue uint64, err error){
+	result,err:=this.PreferedStorage.(CounterStorage).Decr(key,step)
+	if err!=nil{
+		return result,err
+	}
+	result,err=this.BackupStorage.(CounterStorage).Decr(key,step)
+	if err!=nil{
+		return result,err
+	}
+	return result,err
+}

@@ -1,11 +1,22 @@
 package storage
 
+import (
+	"github.com/bradfitz/gomemcache/memcache"
+)
+
 func (this *MemcachedKvStorage) Incr(key interface{},step uint64)(newValue uint64, err error){
 	keyCache, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
+		if err == memcache.ErrCacheMiss {
+			return 0, nil
+		}
 		return 0,err
 	}
-	return this.client.Increment(keyCache,step)
+	result,errcache:=this.client.Increment(keyCache,step)
+	if errcache==memcache.ErrCacheMiss {
+		return 0, nil
+	}
+	return result,errcache
 }
 
 func (this *MemcachedKvStorage) Decr(key interface{},step uint64)(newValue uint64, err error){
@@ -13,5 +24,9 @@ func (this *MemcachedKvStorage) Decr(key interface{},step uint64)(newValue uint6
 	if err != nil {
 		return 0,err
 	}
-	return this.client.Decrement(keyCache,step)
+	result,errcache:=this.client.Decrement(keyCache,step)
+	if errcache==memcache.ErrCacheMiss {
+		return 0, nil
+	}
+	return result,errcache
 }

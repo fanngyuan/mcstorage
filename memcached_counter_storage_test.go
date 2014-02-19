@@ -49,4 +49,15 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
+	resDecr,err:=mcStorage.Decr("2",2)
+	if err!=nil{
+		t.Error("err should be nil",err)
+	}
+	if reflect.TypeOf(res) != reflect.TypeOf(1) {
+		t.Error("res type is not T")
+	}
+	if resDecr!=0{
+		t.Error("value should be 0")
+	}
+
 }
