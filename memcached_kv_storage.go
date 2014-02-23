@@ -9,19 +9,19 @@ import (
 	"strings"
 )
 
-type MemcachedKvStorage struct {
+type MemcachedStorage struct {
 	client            *memcache.Client
 	KeyPrefix         string
 	DefaultExpireTime int
 	T                 reflect.Type
 }
 
-func NewMcStorage(serverUrls []string, keyPrefix string, defaultExpireTime int, t reflect.Type) *MemcachedKvStorage {
+func NewMcStorage(serverUrls []string, keyPrefix string, defaultExpireTime int, t reflect.Type) *MemcachedStorage {
 	client := memcache.New(serverUrls...)
-	return &MemcachedKvStorage{client, keyPrefix, defaultExpireTime, t}
+	return &MemcachedStorage{client, keyPrefix, defaultExpireTime, t}
 }
 
-func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
+func (this *MemcachedStorage) Get(key interface{}) (interface{}, error) {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (this *MemcachedKvStorage) Get(key interface{}) (interface{}, error) {
 	}
 }
 
-func (this *MemcachedKvStorage) bytesToInterface(item *memcache.Item) (interface{}, error) {
+func (this *MemcachedStorage) bytesToInterface(item *memcache.Item) (interface{}, error) {
 	tStruct := reflect.New(this.T)
 	dec := json.NewDecoder(bytes.NewBuffer(item.Value))
 	err := dec.Decode(tStruct.Interface())
@@ -52,7 +52,7 @@ func (this *MemcachedKvStorage) bytesToInterface(item *memcache.Item) (interface
 	return reflect.Indirect(tStruct.Elem()).Interface(), nil
 }
 
-func (this *MemcachedKvStorage) Set(key interface{}, object interface{}) error {
+func (this *MemcachedStorage) Set(key interface{}, object interface{}) error {
 	buf, err := json.Marshal(object)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (this *MemcachedKvStorage) Set(key interface{}, object interface{}) error {
 	return nil
 }
 
-func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error) {
+func (this *MemcachedStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error) {
 	cacheKeys := make([]string, len(keys))
 	for index, key := range keys {
 		cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
@@ -89,7 +89,7 @@ func (this *MemcachedKvStorage) MultiGet(keys []interface{}) (map[interface{}]in
 	return result, nil
 }
 
-func (this *MemcachedKvStorage) MultiSet(objectMap map[interface{}]interface{}) error {
+func (this *MemcachedStorage) MultiSet(objectMap map[interface{}]interface{}) error {
 	for k, v := range objectMap {
 		if err := this.Set(k, v); err != nil {
 			return err
@@ -98,7 +98,7 @@ func (this *MemcachedKvStorage) MultiSet(objectMap map[interface{}]interface{}) 
 	return nil
 }
 
-func (this *MemcachedKvStorage) Delete(key interface{}) error {
+func (this *MemcachedStorage) Delete(key interface{}) error {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return err

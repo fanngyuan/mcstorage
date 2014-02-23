@@ -14,6 +14,11 @@ type CounterStorage interface{
 	Decr(key interface{},step uint64)(newValue uint64, err error)
 }
 
+type ListStorage interface{
+	Storage
+	Getlimit(key ,sinceId ,maxId interface{},page ,count int)(interface{},error)
+}
+
 type StorageProxy struct {
 	PreferedStorage Storage
 	BackupStorage   Storage
