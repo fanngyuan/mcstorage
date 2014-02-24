@@ -8,6 +8,8 @@ type Pagerable interface{
 	Find(key interface{})int
 	Cut(start,end int)interface{}
 	sort.Interface
+	AddItem(value interface{},maxLen int)interface{}
+	DeleteItem(value interface{})interface{}
 }
 
 func SortAndPage(pagerable Pagerable,sinceId,maxId interface{},page,count int)interface{}{
@@ -64,3 +66,27 @@ func (this IntReversedSlice)Cut(start,end int)interface{}{
 func (p IntReversedSlice) Len() int           { return len(p) }
 func (p IntReversedSlice) Less(i, j int) bool { return p[i] > p[j] }
 func (p IntReversedSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+func (p IntReversedSlice) AddItem(value interface{},maxLen int)interface{}{
+	if p.Len()+1>maxLen{
+		result:=make([]int,maxLen)
+		result[0]=value.(int)
+		copy(result[1:],p[:maxLen-1])
+		return IntReversedSlice(result)
+	}else{
+		result:=make([]int,p.Len()+1)
+		result[0]=value.(int)
+		copy(result[1:],p)
+		return IntReversedSlice(result)
+	}
+}
+
+func (p IntReversedSlice) DeleteItem(value interface{})interface{}{
+	index:=p.Find(value)
+	if index==-1{
+		return nil
+	}
+	result:=make([]int,p.Len()-1)
+	copy(result,p[0:index])
+	copy(result[index:],p[index+1:])
+	return IntReversedSlice(result)
+}

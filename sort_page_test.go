@@ -97,3 +97,41 @@ func TestSortPage(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 }
+
+func TestSliceDeleteItem(t *testing.T) {
+	var array []int
+	for i := 1; i <= 200; i++ {
+		array=append(array,i)
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(array)))
+	slice:=IntReversedSlice(array)
+	result:=slice.DeleteItem(190)
+	if len(result.(IntReversedSlice))!=199{
+		t.Error("length should be 199")
+	}
+}
+
+func TestSliceAddItem(t *testing.T) {
+	var array []int
+	for i := 1; i < 200; i++ {
+		array=append(array,i)
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(array)))
+	slice:=IntReversedSlice(array)
+
+	result:=slice.AddItem(200,200)
+	if len(result.(IntReversedSlice))!=200{
+		t.Error("length should be 200")
+	}
+
+	result=result.(IntReversedSlice).AddItem(201,200)
+	if len(result.(IntReversedSlice))!=200{
+		t.Error("length should be 200")
+	}
+	if result.(IntReversedSlice)[0]!=201{
+		t.Error("first one should be 201")
+	}
+	if result.(IntReversedSlice)[199]!=2{
+		t.Error("last one should be 2")
+	}
+}
