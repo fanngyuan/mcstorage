@@ -17,6 +17,8 @@ type CounterStorage interface{
 type ListStorage interface{
 	Storage
 	Getlimit(key ,sinceId ,maxId interface{},page ,count int)(interface{},error)
+	AddItem(key interface{},item interface{})error
+	DeleteItem(key interface{},item interface{})error
 }
 
 type StorageProxy struct {
