@@ -12,12 +12,20 @@ type RedisStorage struct {
 	T                 reflect.Type
 }
 
+func NewRedisStorage(serverUrl string, keyPrefix string, defaultExpireTime int, t reflect.Type)(RedisStorage,error){
+	client,err:=InitClient(serverUrl)
+	return RedisStorage{client, keyPrefix, defaultExpireTime, t},err
+}
+
 func (this RedisStorage) Get(key interface{}) (interface{}, error) {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return nil, err
 	}
 	data, err := this.client.Get(cacheKey)
+	if err != nil||data==nil {
+		return nil, err
+	}
 	object, err := bytesToInterface(data,this.T)
 	if err != nil {
 		return nil, err

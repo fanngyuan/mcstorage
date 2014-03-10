@@ -60,4 +60,13 @@ func TestExists(t *testing.T) {
 	if string(v.([]interface{})[1].([]byte))!="456"{
 		t.Errorf("result should be 456")
 	}
+
+	client.Set("aaa",[]byte("bbb"))
+	client.Delete("aaa")
+	v,err=client.Get("aaa")
+	if len(v.([]byte))!=0{
+		t.Errorf("result len should be 0")
+	}
+	client.ClearAll()
+
 }

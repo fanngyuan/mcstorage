@@ -10,7 +10,7 @@ type RedisClient struct {
 	addr     string
 }
 
-func (rc *RedisClient) Exists(key string) bool {
+func (rc RedisClient) Exists(key string) bool {
 	conn:=rc.connectInit()
 	defer conn.Close()
 	v, err := redis.Bool(conn.Do("EXISTS", key))
@@ -20,7 +20,7 @@ func (rc *RedisClient) Exists(key string) bool {
 	return v
 }
 
-func (rc *RedisClient) Lpush(key string,value interface{}) error {
+func (rc RedisClient) Lpush(key string,value interface{}) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -28,7 +28,7 @@ func (rc *RedisClient) Lpush(key string,value interface{}) error {
 	return err
 }
 
-func (rc *RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {
+func (rc RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -46,7 +46,7 @@ func (rc *RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {
 	return string(values[1].([]byte)),err
 }
 
-func (rc *RedisClient) Set(key string,value []byte) error {
+func (rc RedisClient) Set(key string,value []byte) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -54,15 +54,18 @@ func (rc *RedisClient) Set(key string,value []byte) error {
 	return err
 }
 
-func (rc *RedisClient) Get(key string) ([]byte,error) {
+func (rc RedisClient) Get(key string) ([]byte,error) {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
 	v, err := conn.Do("GET", key)
+	if (err!=nil||v==nil){
+		return nil,err
+	}
 	return v.([]byte),err
 }
 
-func (rc *RedisClient) Delete(key string) error {
+func (rc RedisClient) Delete(key string) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -70,7 +73,7 @@ func (rc *RedisClient) Delete(key string) error {
 	return err
 }
 
-func (rc *RedisClient) Incr(key string) error {
+func (rc RedisClient) Incr(key string) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -78,7 +81,7 @@ func (rc *RedisClient) Incr(key string) error {
 	return err
 }
 
-func (rc *RedisClient) Decr(key string) error {
+func (rc RedisClient) Decr(key string) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -86,7 +89,7 @@ func (rc *RedisClient) Decr(key string) error {
 	return err
 }
 
-func (rc *RedisClient) MultiGet(keys []interface{})([]interface{},error){
+func (rc RedisClient) MultiGet(keys []interface{})([]interface{},error){
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -94,7 +97,7 @@ func (rc *RedisClient) MultiGet(keys []interface{})([]interface{},error){
 	return v.([]interface{}),err
 }
 
-func (rc *RedisClient) MultiSet(kvMap map[string][]byte) error {
+func (rc RedisClient) MultiSet(kvMap map[string][]byte) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -108,7 +111,7 @@ func (rc *RedisClient) MultiSet(kvMap map[string][]byte) error {
 	return err
 }
 
-func (rc *RedisClient) ClearAll() error {
+func (rc RedisClient) ClearAll() error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
@@ -116,12 +119,12 @@ func (rc *RedisClient) ClearAll() error {
 	return err
 }
 
-func (rc *RedisClient) connectInit() redis.Conn {
+func (rc RedisClient) connectInit() redis.Conn {
 	conn:=rc.pool.Get()
 	return conn
 }
 
-func InitClient(addr string) (*RedisClient,error) {
+func InitClient(addr string) (RedisClient,error) {
 	pool := &redis.Pool{
 		MaxIdle: 3,
 		IdleTimeout: 240 * time.Second,
@@ -137,5 +140,5 @@ func InitClient(addr string) (*RedisClient,error) {
 			return err
 		},
 	}
-	return &RedisClient{pool,addr},nil
+	return RedisClient{pool,addr},nil
 }
