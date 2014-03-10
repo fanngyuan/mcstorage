@@ -36,7 +36,7 @@ func TestExists(t *testing.T) {
 	}
 
 	client.ClearAll()
-	client.Incr("aaa")
+	client.Incr("aaa",1)
 	v,err=client.Get("aaa")
 	if string(v.([]byte))!="1"{
 		t.Errorf("result should be 1")

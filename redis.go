@@ -73,20 +73,26 @@ func (rc RedisClient) Delete(key string) error {
 	return err
 }
 
-func (rc RedisClient) Incr(key string) error {
+func (rc RedisClient) Incr(key string,step uint64)(int64, error) {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("INCR", key)
-	return err
+	value, err := conn.Do("INCRBY", key,step)
+	if err!=nil{
+		return 0,nil
+	}
+	return value.(int64),err
 }
 
-func (rc RedisClient) Decr(key string) error {
+func (rc RedisClient) Decr(key string,step uint64)(int64 ,error ){
 	conn:=rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("DECR", key)
-	return err
+	value, err := conn.Do("DECRBY", key,step)
+	if err!=nil{
+		return 0,nil
+	}
+	return value.(int64),err
 }
 
 func (rc RedisClient) MultiGet(keys []interface{})([]interface{},error){
