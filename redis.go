@@ -62,6 +62,14 @@ func (rc *RedisClient) Get(key string) ([]byte,error) {
 	return v.([]byte),err
 }
 
+func (rc *RedisClient) Delete(key string) error {
+	conn:=rc.connectInit()
+	defer conn.Close()
+
+	_, err := conn.Do("DEL", key)
+	return err
+}
+
 func (rc *RedisClient) Incr(key string) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
