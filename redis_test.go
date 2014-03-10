@@ -69,4 +69,15 @@ func TestExists(t *testing.T) {
 	}
 	client.ClearAll()
 
+
+	for i:=0;i<100;i++{
+		client.Rpush("aaa",i)
+	}
+	reli,err:=client.Lrange("aaa",0,19)
+	fmt.Println(reli[0])
+	if len(reli)!=20{
+		t.Errorf("result len should be 20")
+	}
+	client.ClearAll()
+
 }

@@ -28,6 +28,22 @@ func (rc RedisClient) Lpush(key string,value interface{}) error {
 	return err
 }
 
+func (rc RedisClient) Rpush(key string,value interface{}) error {
+	conn:=rc.connectInit()
+	defer conn.Close()
+
+	_, err := conn.Do("RPUSH", key, value)
+	return err
+}
+
+func (rc RedisClient) Lrange(key string,start,end int)([]interface{}, error) {
+	conn:=rc.connectInit()
+	defer conn.Close()
+
+	v, err := conn.Do("LRANGE", key, start,end)
+	return v.([]interface{}),err
+}
+
 func (rc RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {
 	conn:=rc.connectInit()
 	defer conn.Close()
