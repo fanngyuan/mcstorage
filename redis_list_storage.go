@@ -22,7 +22,7 @@ func (this RedisListStorage) Set(key interface{}, object interface{}) error {
 	if err != nil {
 		return err
 	}
-	return this.client.Lpush(cacheKey,object)
+	return this.client.Rpush(cacheKey,object)
 }
 
 func (this RedisListStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error){

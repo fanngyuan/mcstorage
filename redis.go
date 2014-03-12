@@ -4,7 +4,6 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"time"
 	"reflect"
-//	"fmt"
 )
 
 type RedisClient struct {
@@ -31,7 +30,7 @@ func (rc RedisClient) Lpush(key string,value interface{}) error {
 		values:=make([]interface{},s.Len()+1)
 		values[0]=key
         for i := 1; i <= s.Len(); i++ {
-			values[i]=s.Index(i-1)
+			values[i]=s.Index(i-1).Interface()
         }
 		_, err := conn.Do("LPUSH", values...)
 		return err
@@ -45,8 +44,19 @@ func (rc RedisClient) Rpush(key string,value interface{}) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("RPUSH", key, value)
-	return err
+	if reflect.TypeOf(value).Kind()==reflect.Slice{
+		s := reflect.ValueOf(value)
+		values:=make([]interface{},s.Len()+1)
+		values[0]=key
+        for i := 1; i <= s.Len(); i++ {
+			values[i]=s.Index(i-1).Interface()
+        }
+		_, err := conn.Do("RPUSH", values...)
+		return err
+	}else{
+		_, err := conn.Do("RPUSH", key, value)
+		return err
+	}
 }
 
 func (rc RedisClient) Lrange(key string,start,end int)([]interface{}, error) {
