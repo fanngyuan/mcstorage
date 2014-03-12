@@ -3,6 +3,8 @@ package storage
 import (
 	"github.com/garyburd/redigo/redis"
 	"time"
+	"reflect"
+//	"fmt"
 )
 
 type RedisClient struct {
@@ -24,8 +26,19 @@ func (rc RedisClient) Lpush(key string,value interface{}) error {
 	conn:=rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("LPUSH", key, value)
-	return err
+	if reflect.TypeOf(value).Kind()==reflect.Slice{
+		s := reflect.ValueOf(value)
+		values:=make([]interface{},s.Len()+1)
+		values[0]=key
+        for i := 1; i <= s.Len(); i++ {
+			values[i]=s.Index(i-1)
+        }
+		_, err := conn.Do("LPUSH", values...)
+		return err
+	}else{
+		_, err := conn.Do("LPUSH", key, value)
+		return err
+	}
 }
 
 func (rc RedisClient) Rpush(key string,value interface{}) error {
@@ -42,6 +55,14 @@ func (rc RedisClient) Lrange(key string,start,end int)([]interface{}, error) {
 
 	v, err := conn.Do("LRANGE", key, start,end)
 	return v.([]interface{}),err
+}
+
+func (rc RedisClient) Lrem(key string,value interface{},remType int) error {
+	conn:=rc.connectInit()
+	defer conn.Close()
+
+	_, err := conn.Do("LREM", key,remType ,value)
+	return err
 }
 
 func (rc RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {

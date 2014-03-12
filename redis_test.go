@@ -74,7 +74,7 @@ func TestExists(t *testing.T) {
 		client.Rpush("aaa",i)
 	}
 	reli,err:=client.Lrange("aaa",0,19)
-	fmt.Println(reli[0])
+
 	if len(reli)!=20{
 		t.Errorf("result len should be 20")
 	}
