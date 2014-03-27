@@ -1,8 +1,6 @@
 package storage
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"github.com/bradfitz/gomemcache/memcache"
 	"reflect"
@@ -13,12 +11,12 @@ type MemcachedStorage struct {
 	client            *memcache.Client
 	KeyPrefix         string
 	DefaultExpireTime int
-	T                 reflect.Type
+	encoding          Encoding
 }
 
-func NewMcStorage(serverUrls []string, keyPrefix string, defaultExpireTime int, t reflect.Type) *MemcachedStorage {
+func NewMcStorage(serverUrls []string, keyPrefix string, defaultExpireTime int,encoding Encoding) *MemcachedStorage {
 	client := memcache.New(serverUrls...)
-	return &MemcachedStorage{client, keyPrefix, defaultExpireTime, t}
+	return &MemcachedStorage{client, keyPrefix, defaultExpireTime,encoding}
 }
 
 func (this *MemcachedStorage) Get(key interface{}) (interface{}, error) {
@@ -33,7 +31,7 @@ func (this *MemcachedStorage) Get(key interface{}) (interface{}, error) {
 		}
 		return nil, err
 	} else {
-		object, err := this.bytesToInterface(item)
+		object, err := this.encoding.Unmarshal(item.Value)
 		if err != nil {
 			return nil, err
 		} else {
@@ -42,18 +40,8 @@ func (this *MemcachedStorage) Get(key interface{}) (interface{}, error) {
 	}
 }
 
-func (this *MemcachedStorage) bytesToInterface(item *memcache.Item) (interface{}, error) {
-	tStruct := reflect.New(this.T)
-	dec := json.NewDecoder(bytes.NewBuffer(item.Value))
-	err := dec.Decode(tStruct.Interface())
-	if err != nil {
-		return err, nil
-	}
-	return reflect.Indirect(tStruct.Elem()).Interface(), nil
-}
-
 func (this *MemcachedStorage) Set(key interface{}, object interface{}) error {
-	buf, err := json.Marshal(object)
+	buf, err := this.encoding.Marshal(object)
 	if err != nil {
 		return err
 	}
@@ -80,7 +68,7 @@ func (this *MemcachedStorage) MultiGet(keys []interface{}) (map[interface{}]inte
 	}
 	result := make(map[interface{}]interface{})
 	for k, item := range itemMap {
-		object, err := this.bytesToInterface(item)
+		object, err := this.encoding.Unmarshal(item.Value)
 		if err != nil {
 			continue
 		}

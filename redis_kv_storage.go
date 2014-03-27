@@ -1,20 +1,15 @@
 package storage
 
-import (
-	"reflect"
-	"encoding/json"
-)
-
 type RedisStorage struct {
 	client            RedisClient
 	KeyPrefix         string
 	DefaultExpireTime int
-	T                 reflect.Type
+	encoding          Encoding
 }
 
-func NewRedisStorage(serverUrl string, keyPrefix string, defaultExpireTime int, t reflect.Type)(RedisStorage,error){
+func NewRedisStorage(serverUrl string, keyPrefix string, defaultExpireTime int,encoding Encoding)(RedisStorage,error){
 	client,err:=InitClient(serverUrl)
-	return RedisStorage{client, keyPrefix, defaultExpireTime, t},err
+	return RedisStorage{client, keyPrefix, defaultExpireTime, encoding},err
 }
 
 func (this RedisStorage) Get(key interface{}) (interface{}, error) {
@@ -26,7 +21,7 @@ func (this RedisStorage) Get(key interface{}) (interface{}, error) {
 	if err != nil||data==nil {
 		return nil, err
 	}
-	object, err := bytesToInterface(data,this.T)
+	object, err := this.encoding.Unmarshal(data)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +30,7 @@ func (this RedisStorage) Get(key interface{}) (interface{}, error) {
 }
 
 func (this RedisStorage) Set(key interface{}, object interface{}) error {
-	buf, err := json.Marshal(object)
+	buf, err := this.encoding.Marshal(object)
 	if err != nil {
 		return err
 	}
@@ -62,7 +57,7 @@ func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface
 	}
 	result := make(map[interface{}]interface{})
 	for i,value :=range values{
-		object,err:=bytesToInterface(value.([]byte),this.T)
+		object,err:=this.encoding.Unmarshal(value.([]byte))
 		if err != nil {
 			continue
 		}
@@ -74,7 +69,7 @@ func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface
 func (this RedisStorage) MultiSet(valueMap map[interface{}]interface{}) error{
 	tempMap:=make(map[string][]byte)
 	for key,value :=range valueMap{
-		buf, err := json.Marshal(value)
+		buf, err := this.encoding.Marshal(value)
 		if err!=nil{
 			continue
 		}

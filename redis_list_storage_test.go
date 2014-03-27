@@ -14,7 +14,8 @@ func TestGetLimitRedis(t *testing.T) {
 
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
-	redisStorage,_ := NewRedisStorage(":6379", "test", 0, reflect.TypeOf(&slice))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(slice)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	redisListStorage:=RedisListStorage{redisStorage}
 	redisListStorage.Set("1", slice)
 	result, _ := redisListStorage.Getlimit("1",0,0,1,20)
@@ -38,7 +39,8 @@ func TestAddItemRedis(t *testing.T) {
 
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
-	redisStorage ,_:= NewRedisStorage(":6379", "test", 0, reflect.TypeOf(&slice))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(slice)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	redisListStorage:=RedisListStorage{redisStorage}
 
 	redisListStorage.Set("1", slice)

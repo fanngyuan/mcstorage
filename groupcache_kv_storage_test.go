@@ -10,7 +10,8 @@ import (
 func TestGetSetGC(t *testing.T) {
 	tt := T{1}
 
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(&tt))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
 	mcStorage.Set("1", tt)
 	res, _ := mcStorage.Get("1")
 	defer mcStorage.Delete("1")
@@ -35,7 +36,7 @@ func TestGetSetGC(t *testing.T) {
 			dest.SetBytes(bytes)
 			return nil
 		}))
-	gcStorage := &GroupCacheKvStorage{groupcache,0,reflect.TypeOf(&tt)}
+	gcStorage := &GroupCacheKvStorage{groupcache,0,jsonEncoding}
 	res,_=gcStorage.Get("1")
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")

@@ -6,7 +6,8 @@ import (
 )
 
 func TestIncrDecr(t *testing.T) {
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(1))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
 	mcStorage.Set("1", 1)
 	res, _ := mcStorage.Get("1")
 	defer mcStorage.Delete("1")

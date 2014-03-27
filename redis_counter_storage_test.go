@@ -6,7 +6,8 @@ import (
 )
 
 func TestIncrDecrRedis(t *testing.T) {
-	redisStorage ,_:= NewRedisStorage(":6379", "test", 0, reflect.TypeOf(1))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	redisStorage.Set("1", 1)
 	res, _ := redisStorage.Get("1")
 	defer redisStorage.Delete("1")

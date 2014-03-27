@@ -8,8 +8,10 @@ import (
 
 func TestGetSetProxy(t *testing.T) {
 	tt := T{1}
-	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(&tt))
-	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(&tt))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, jsonEncoding)
+	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, jsonEncoding)
+
 	storageProxy := NewStorageProxy(mcStorage1, mcStorage2)
 
 	mcStorage1.Set("1", tt)
@@ -50,8 +52,10 @@ func TestGetSetProxy(t *testing.T) {
 
 func TestMultiGetSetProxy(t *testing.T) {
 	tt := T{1}
-	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(&tt))
-	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(&tt))
+
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, jsonEncoding)
+	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, jsonEncoding)
 	storageProxy := &StorageProxy{mcStorage1, mcStorage2}
 
 	valueMap := make(map[interface{}]interface{})
@@ -120,8 +124,10 @@ func TestMultiGetSetProxy(t *testing.T) {
 
 func TestDeleteProxy(t *testing.T) {
 	tt := T{1}
-	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(&tt))
-	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(&tt))
+
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, jsonEncoding)
+	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, jsonEncoding)
 	storageProxy := &StorageProxy{mcStorage1, mcStorage2}
 
 	mcStorage2.Set("2", tt)
@@ -162,8 +168,10 @@ func TestDeleteProxy(t *testing.T) {
 }
 
 func TestIncrDecrProxy(t *testing.T) {
-	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, reflect.TypeOf(1))
-	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, reflect.TypeOf(1))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
+	mcStorage1 := NewMcStorage([]string{"localhost:12000"}, "test_1", 0, jsonEncoding)
+	mcStorage2 := NewMcStorage([]string{"localhost:12000"}, "test_2", 0, jsonEncoding)
+
 	storageProxy := NewStorageProxy(mcStorage1, mcStorage2)
 
 	mcStorage2.Set("1", 1)

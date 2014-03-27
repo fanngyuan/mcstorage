@@ -1,5 +1,11 @@
 package storage
 
+import (
+	"encoding/json"
+	"reflect"
+	"bytes"
+)
+
 type Storage interface {
 	Get(key interface{}) (interface{}, error)
 	Set(key interface{}, object interface{}) error
@@ -24,6 +30,30 @@ type ListStorage interface{
 type StorageProxy struct {
 	PreferedStorage Storage
 	BackupStorage   Storage
+}
+
+type Encoding interface {
+	Marshal(v interface{}) ([]byte, error)
+	Unmarshal(data []byte) (interface{}, error)
+}
+
+type JsonEncoding struct{
+	T                 reflect.Type
+}
+
+func (this JsonEncoding) Marshal(v interface{}) ([]byte, error){
+	buf, err := json.Marshal(v)
+	return buf,err
+}
+
+func (this JsonEncoding) Unmarshal(data []byte)(interface{}, error){
+	tStruct := reflect.New(this.T)
+	dec := json.NewDecoder(bytes.NewBuffer(data))
+	err := dec.Decode(tStruct.Interface())
+	if err != nil {
+		return err, nil
+	}
+	return reflect.Indirect(tStruct.Elem()).Interface(), nil
 }
 
 func NewStorageProxy(prefered, backup Storage) *StorageProxy {

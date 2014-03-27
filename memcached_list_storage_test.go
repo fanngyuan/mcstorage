@@ -14,7 +14,10 @@ func TestGetLimit(t *testing.T) {
 
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(&slice))
+
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
 	mcStorage.Set("1", slice)
 	result, _ := mcStorage.Getlimit("1",0,0,1,20)
 	defer mcStorage.Delete("1")
@@ -38,7 +41,8 @@ func TestAddItem(t *testing.T) {
 
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, reflect.TypeOf(&slice))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
 	mcStorage.Set("1", slice)
 	result, _ := mcStorage.Getlimit("1",0,0,1,20)
 	defer mcStorage.Delete("1")

@@ -9,7 +9,8 @@ import (
 func TestGetSetRedis(t *testing.T) {
 	tt := T{1}
 
-	redisStorage,_ := NewRedisStorage(":6379", "test", 0, reflect.TypeOf(&tt))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	redisStorage.Set("1", tt)
 	res, _ := redisStorage.Get("1")
 	defer redisStorage.Delete("1")
@@ -24,7 +25,8 @@ func TestGetSetRedis(t *testing.T) {
 
 func TestMultiGetSetRedis(t *testing.T) {
 	tt := T{1}
-	redisStorage,_ := NewRedisStorage(":6379", "test", 0, reflect.TypeOf(&tt))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	valueMap := make(map[interface{}]interface{})
 	keys := make([]interface{}, 10)
 	for i := 0; i < 10; i++ {
@@ -51,7 +53,8 @@ func TestMultiGetSetRedis(t *testing.T) {
 
 func TestGetSetDeleteRedis(t *testing.T) {
 	tt := T{1}
-	redisStorage,_ := NewRedisStorage(":6379", "test", 0, reflect.TypeOf(&tt))
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
 	redisStorage.Set("1", tt)
 	res, _ := redisStorage.Get("1")
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
