@@ -89,3 +89,7 @@ func (this RedisStorage) Delete(key interface{}) error{
 	}
 	return this.client.Delete(cacheKey)
 }
+
+func (this RedisStorage) FlushAll(){
+	this.client.ClearAll()
+}

@@ -95,6 +95,9 @@ func (this *MemcachedStorage) Delete(key interface{}) error {
 	return nil
 }
 
+func (this MemcachedStorage) FlushAll() {
+}
+
 func BuildCacheKey(keyPrefix interface{}, key interface{}) (cacheKey string, err error) {
 	if key == nil {
 		return "", errors.New("key should not be nil")

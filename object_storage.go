@@ -12,6 +12,7 @@ type Storage interface {
 	MultiGet(keys []interface{}) (map[interface{}]interface{}, error)
 	MultiSet(map[interface{}]interface{}) error
 	Delete(key interface{}) error
+	FlushAll()
 }
 
 type CounterStorage interface{
@@ -172,4 +173,9 @@ func (this *StorageProxy) Decr(key interface{},step uint64)(newValue uint64, err
 		return result,err
 	}
 	return result,err
+}
+
+func (this *StorageProxy) FlushAll(){
+	this.PreferedStorage.FlushAll()
+	this.BackupStorage.FlushAll()
 }

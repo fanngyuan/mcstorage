@@ -43,3 +43,6 @@ func (this *GroupCacheKvStorage) MultiSet(objectMap map[interface{}]interface{})
 func (this *GroupCacheKvStorage) Delete(key interface{}) error {
 	return nil
 }
+
+func (this GroupCacheKvStorage) FlushAll() {
+}
