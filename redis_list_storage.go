@@ -1,11 +1,21 @@
 package storage
 
 import (
-	//"github.com/bradfitz/gomemcache/memcache"
+	"strconv"
+	"sort"
 )
 
 type RedisListStorage struct {
 	RedisStorage
+	decodeList DecodeList
+}
+
+type DecodeList func(data []interface{})Pagerable
+
+func NewRedisListStorage(serverUrl string, keyPrefix string, defaultExpireTime int,decode DecodeList)(RedisListStorage,error){
+	client,err:=InitClient(serverUrl)
+	redisStorage:=RedisStorage{client, keyPrefix, defaultExpireTime, nil}
+	return RedisListStorage{redisStorage,decode},err
 }
 
 func (this RedisListStorage) Get(key interface{}) (interface{}, error) {
@@ -14,7 +24,11 @@ func (this RedisListStorage) Get(key interface{}) (interface{}, error) {
 		return nil, err
 	}
 	data, err := this.client.Lrange(cacheKey,0,MAXLEN)
-	return data,err
+	if err != nil {
+		return nil, err
+	}
+	pageData:=this.decodeList(data)
+	return pageData,err
 }
 
 func (this RedisListStorage) Set(key interface{}, object interface{}) error {
@@ -54,7 +68,12 @@ func (this RedisListStorage) Getlimit(key,sinceId,maxId interface{},page,count i
 		return nil, err
 	}
 	if sinceId==0 && maxId==0{
-		return this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
+		data,err:=this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
+		if err!=nil{
+			return nil,err
+		}
+		pageData:=this.decodeList(data)
+		return pageData,nil
 	}
 	obj,err:=this.Get(key)
 	if err!=nil{
@@ -77,4 +96,18 @@ func (this RedisListStorage) DeleteItem(key interface{},item interface{})error{
 		return err
 	}
 	return this.client.Lrem(cacheKey,item,0)
+}
+
+func DecodeIntReversedSlice(data []interface{})Pagerable{
+	intArray:= make([]int,len(data))
+	for i,item := range data{
+		intItem,err:=strconv.Atoi(string(item.([]byte)))
+		if err!=nil{
+			continue
+		}
+		intArray[i]=intItem
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(intArray)))
+	slice:=IntReversedSlice(intArray)
+	return slice
 }

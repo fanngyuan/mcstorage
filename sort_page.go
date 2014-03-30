@@ -26,9 +26,8 @@ func Page(pagerable Pagerable,sinceId,maxId interface{},page,count int)interface
 		end=pagerable.Len()-1
 	}
 	i=pagerable.Find(maxId)
-	if i>0{
-		start=i+1
-	}
+	start=i+1
+
 	start=start+(page-1)*count
 
 	if start>end && end!=0{

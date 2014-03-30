@@ -31,6 +31,17 @@ func TestGetLimit(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 
+	result, _ = mcStorage.Getlimit("1",0,200,1,20)
+	if result.(IntReversedSlice).Len()!=20{
+		t.Error("len should be 20")
+	}
+	if result.(IntReversedSlice)[0]!=199{
+		t.Error("first one should be 199")
+	}
+	if result.(IntReversedSlice)[19]!=180{
+		t.Error("first one should be 180")
+	}
+
 }
 
 func TestAddItem(t *testing.T) {

@@ -23,6 +23,18 @@ func TestPage(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 
+	result=Page(IntReversedSlice(array),0,200,1,20)
+
+	if result.(IntReversedSlice).Len()!=20{
+		t.Error("len should be 20")
+	}
+	if result.(IntReversedSlice)[0]!=199{
+		t.Errorf("first one should be 199"," real value is ",result.(IntReversedSlice)[0])
+	}
+	if result.(IntReversedSlice)[19]!=180{
+		t.Error("first one should be 180"," real value is ",result.(IntReversedSlice)[19])
+	}
+
 	result=Page(IntReversedSlice(array),0,0,2,20)
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
