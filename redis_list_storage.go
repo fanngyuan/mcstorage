@@ -3,6 +3,7 @@ package storage
 import (
 	"strconv"
 	"sort"
+	"reflect"
 )
 
 type RedisListStorage struct {
@@ -67,7 +68,8 @@ func (this RedisListStorage) Getlimit(key,sinceId,maxId interface{},page,count i
 	if err != nil {
 		return nil, err
 	}
-	if sinceId==0 && maxId==0{
+
+	if reflect.ValueOf(sinceId).Int()==0 && reflect.ValueOf(maxId).Int()==0{
 		data,err:=this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
 		if err!=nil{
 			return nil,err
