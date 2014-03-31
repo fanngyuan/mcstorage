@@ -2,7 +2,7 @@ package storage
 
 import (
 	"errors"
-	"github.com/bradfitz/gomemcache/memcache"
+	"github.com/fanngyuan/gomemcache/memcache"
 	"reflect"
 	"strings"
 )
@@ -96,6 +96,7 @@ func (this *MemcachedStorage) Delete(key interface{}) error {
 }
 
 func (this MemcachedStorage) FlushAll() {
+	this.client.FlushAll()
 }
 
 func BuildCacheKey(keyPrefix interface{}, key interface{}) (cacheKey string, err error) {

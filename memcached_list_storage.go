@@ -1,9 +1,5 @@
 package storage
 
-import (
-	//"github.com/bradfitz/gomemcache/memcache"
-)
-
 var MAXLEN=200
 
 func (this *MemcachedStorage) Getlimit(key,sinceId,maxId interface{},page,count int)(interface{},error){
