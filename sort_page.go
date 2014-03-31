@@ -48,9 +48,18 @@ type IntReversedSlice []int
 
 //for reversed slice for [5,4,3,2,1]
 func (this IntReversedSlice)Find(key interface{}) int{
-	k:=reflect.ValueOf(key).Int()
-	if k==0{
-		return -1
+	var k int
+	if reflect.ValueOf(key).Type().Kind()==reflect.Uint{
+		k=int(reflect.ValueOf(key).Uint())
+		if k==0{
+			return -1
+		}
+	}
+	if reflect.ValueOf(key).Type().Kind()==reflect.Int{
+		k=int(reflect.ValueOf(key).Int())
+		if k==0{
+			return -1
+		}
 	}
 	i := sort.Search(len(this), func(i int) bool { return this[i] <= int(k) })
 	if i < len(this) && this[i] == key {

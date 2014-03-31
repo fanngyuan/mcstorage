@@ -69,13 +69,25 @@ func (this RedisListStorage) Getlimit(key,sinceId,maxId interface{},page,count i
 		return nil, err
 	}
 
-	if reflect.ValueOf(sinceId).Int()==0 && reflect.ValueOf(maxId).Int()==0{
-		data,err:=this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
-		if err!=nil{
-			return nil,err
+	if reflect.ValueOf(sinceId).Type().Kind()==reflect.Int{
+		if reflect.ValueOf(sinceId).Int()==0 && reflect.ValueOf(maxId).Int()==0{
+			data,err:=this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
+			if err!=nil{
+				return nil,err
+			}
+			pageData:=this.decodeList(data)
+			return pageData,nil
 		}
-		pageData:=this.decodeList(data)
-		return pageData,nil
+	}
+	if reflect.ValueOf(sinceId).Type().Kind()==reflect.Uint{
+		if reflect.ValueOf(sinceId).Uint()==0 && reflect.ValueOf(maxId).Uint()==0{
+			data,err:=this.client.Lrange(cacheKey,(page-1)*count,page*count-1)
+			if err!=nil{
+				return nil,err
+			}
+			pageData:=this.decodeList(data)
+			return pageData,nil
+		}
 	}
 	obj,err:=this.Get(key)
 	if err!=nil{
