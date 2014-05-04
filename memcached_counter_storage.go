@@ -4,7 +4,7 @@ import (
 	"github.com/fanngyuan/gomemcache/memcache"
 )
 
-func (this *MemcachedStorage) Incr(key interface{},step uint64)(newValue uint64, err error){
+func (this MemcachedStorage) Incr(key interface{},step uint64)(newValue uint64, err error){
 	keyCache, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		if err == memcache.ErrCacheMiss {
@@ -19,7 +19,7 @@ func (this *MemcachedStorage) Incr(key interface{},step uint64)(newValue uint64,
 	return result,errcache
 }
 
-func (this *MemcachedStorage) Decr(key interface{},step uint64)(newValue uint64, err error){
+func (this MemcachedStorage) Decr(key interface{},step uint64)(newValue uint64, err error){
 	keyCache, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return 0,err
