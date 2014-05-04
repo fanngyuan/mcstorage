@@ -12,9 +12,9 @@ func TestGetSetGC(t *testing.T) {
 
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
-	mcStorage.Set("1", tt)
-	res, _ := mcStorage.Get("1")
-	defer mcStorage.Delete("1")
+	mcStorage.Set(String("1"), tt)
+	res, _ := mcStorage.Get(String("1"))
+	defer mcStorage.Delete(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")
 	}
@@ -25,7 +25,7 @@ func TestGetSetGC(t *testing.T) {
 
 	var groupcache = groupcache.NewGroup("SlowDBCache", 64<<20, groupcache.GetterFunc(
 		func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
-			result,err := mcStorage.Get(key)
+			result,err := mcStorage.Get(String(key))
 			if err!=nil{
 				return nil
 			}
@@ -37,7 +37,7 @@ func TestGetSetGC(t *testing.T) {
 			return nil
 		}))
 	gcStorage := &GroupCacheKvStorage{groupcache,0,jsonEncoding}
-	res,_=gcStorage.Get("1")
+	res,_=gcStorage.Get(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")
 	}
@@ -46,8 +46,8 @@ func TestGetSetGC(t *testing.T) {
 		t.Error("res A field is not equals tt field")
 	}
 
-	mcStorage.Delete("1")
-	res,_=gcStorage.Get("1")
+	mcStorage.Delete(String("1"))
+	res,_=gcStorage.Get(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
 		t.Error("res type is not T")
 	}

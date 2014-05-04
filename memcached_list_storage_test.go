@@ -18,9 +18,9 @@ func TestGetLimit(t *testing.T) {
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
 
-	mcStorage.Set("1", slice)
-	result, _ := mcStorage.Getlimit("1",0,0,1,20)
-	defer mcStorage.Delete("1")
+	mcStorage.Set(String("1"), slice)
+	result, _ := mcStorage.Getlimit(String("1"),0,0,1,20)
+	defer mcStorage.Delete(String("1"))
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
 	}
@@ -31,7 +31,7 @@ func TestGetLimit(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 
-	result, _ = mcStorage.Getlimit("1",0,200,1,20)
+	result, _ = mcStorage.Getlimit(String("1"),0,200,1,20)
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
 	}
@@ -54,9 +54,9 @@ func TestAddItem(t *testing.T) {
 	slice:=IntReversedSlice(array)
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
-	mcStorage.Set("1", slice)
-	result, _ := mcStorage.Getlimit("1",0,0,1,20)
-	defer mcStorage.Delete("1")
+	mcStorage.Set(String("1"), slice)
+	result, _ := mcStorage.Getlimit(String("1"),0,0,1,20)
+	defer mcStorage.Delete(String("1"))
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
 	}
@@ -67,8 +67,8 @@ func TestAddItem(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 
-	mcStorage.AddItem("1",201)
-	result, _ = mcStorage.Getlimit("1",0,0,1,20)
+	mcStorage.AddItem(String("1"),201)
+	result, _ = mcStorage.Getlimit(String("1"),0,0,1,20)
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
 	}
@@ -79,8 +79,8 @@ func TestAddItem(t *testing.T) {
 		t.Error("first one should be 182")
 	}
 
-	mcStorage.DeleteItem("1",193)
-	result, _ = mcStorage.Getlimit("1",0,0,1,20)
+	mcStorage.DeleteItem(String("1"),193)
+	result, _ = mcStorage.Getlimit(String("1"),0,0,1,20)
 	if result.(IntReversedSlice).Len()!=20{
 		t.Error("len should be 20")
 	}

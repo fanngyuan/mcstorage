@@ -14,9 +14,9 @@ func TestGetLimitRedis(t *testing.T) {
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
 	redisListStorage,_ := NewRedisListStorage(":6379", "test", 0, DecodeIntReversedSlice)
-	redisListStorage.Set("1", slice)
-	result, _ := redisListStorage.Getlimit("1",0,0,1,20)
-	defer redisListStorage.Delete("1")
+	redisListStorage.Set(String("1"), slice)
+	result, _ := redisListStorage.Getlimit(String("1"),0,0,1,20)
+	defer redisListStorage.Delete(String("1"))
 	if len(result.(IntReversedSlice))!=20{
 		t.Error("len should be 20")
 	}
@@ -38,9 +38,9 @@ func TestAddItemRedis(t *testing.T) {
 	slice:=IntReversedSlice(array)
 	redisListStorage,_ := NewRedisListStorage(":6379", "test", 0, DecodeIntReversedSlice)
 
-	redisListStorage.Set("1", slice)
-	result, _ := redisListStorage.Getlimit("1",0,0,1,20)
-	defer redisListStorage.Delete("1")
+	redisListStorage.Set(String("1"), slice)
+	result, _ := redisListStorage.Getlimit(String("1"),0,0,1,20)
+	defer redisListStorage.Delete(String("1"))
 	if len(result.(IntReversedSlice))!=20{
 		t.Error("len should be 20")
 	}
@@ -51,7 +51,7 @@ func TestAddItemRedis(t *testing.T) {
 		t.Error("first one should be 181")
 	}
 
-	result, _ = redisListStorage.Getlimit("1",0,200,1,20)
+	result, _ = redisListStorage.Getlimit(String("1"),0,200,1,20)
 	if len(result.(IntReversedSlice))!=20{
 		t.Error("len should be 20")
 	}
@@ -62,8 +62,8 @@ func TestAddItemRedis(t *testing.T) {
 		t.Error("first one should be 180")
 	}
 
-	redisListStorage.AddItem("1",201)
-	result, _ = redisListStorage.Getlimit("1",0,0,1,20)
+	redisListStorage.AddItem(String("1"),201)
+	result, _ = redisListStorage.Getlimit(String("1"),0,0,1,20)
 	if len(result.(IntReversedSlice))!=20{
 		t.Error("len should be 20")
 	}
@@ -74,8 +74,8 @@ func TestAddItemRedis(t *testing.T) {
 		t.Error("first one should be 182")
 	}
 
-	redisListStorage.DeleteItem("1",193)
-	result, _ = redisListStorage.Getlimit("1",0,0,1,20)
+	redisListStorage.DeleteItem(String("1"),193)
+	result, _ = redisListStorage.Getlimit(String("1"),0,0,1,20)
 	if len(result.(IntReversedSlice))!=20{
 		t.Error("len should be 20")
 	}

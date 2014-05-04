@@ -10,9 +10,9 @@ type GroupCacheKvStorage struct{
 	encoding          Encoding
 }
 
-func (this *GroupCacheKvStorage) Get(key interface{}) (interface{}, error) {
+func (this GroupCacheKvStorage) Get(key Key) (interface{}, error) {
 	var data []byte
-	this.CacheGroup.Get(nil,key.(string),groupcache.AllocatingByteSliceSink(&data))
+	this.CacheGroup.Get(nil,key.ToString(),groupcache.AllocatingByteSliceSink(&data))
 	object, err := this.encoding.Unmarshal(data)
 	if err != nil {
 		return nil, err
@@ -20,12 +20,12 @@ func (this *GroupCacheKvStorage) Get(key interface{}) (interface{}, error) {
 	return object,nil
 }
 
-func (this *GroupCacheKvStorage) Set(key interface{}, object interface{}) error {
+func (this GroupCacheKvStorage) Set(key Key, object interface{}) error {
 	return nil
 }
 
-func (this *GroupCacheKvStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error) {
-	resultMap := make(map[interface{}]interface{})
+func (this GroupCacheKvStorage) MultiGet(keys []Key) (map[Key]interface{}, error) {
+	resultMap := make(map[Key]interface{})
 	for _,key := range(keys){
 		value,err:=this.Get(key)
 		if err !=nil{
@@ -36,11 +36,11 @@ func (this *GroupCacheKvStorage) MultiGet(keys []interface{}) (map[interface{}]i
 	return resultMap,nil
 }
 
-func (this *GroupCacheKvStorage) MultiSet(objectMap map[interface{}]interface{}) error {
+func (this GroupCacheKvStorage) MultiSet(objectMap map[Key]interface{}) error {
 	return nil
 }
 
-func (this *GroupCacheKvStorage) Delete(key interface{}) error {
+func (this GroupCacheKvStorage) Delete(key Key) error {
 	return nil
 }
 

@@ -12,7 +12,7 @@ func NewRedisStorage(serverUrl string, keyPrefix string, defaultExpireTime int,e
 	return RedisStorage{client, keyPrefix, defaultExpireTime, encoding},err
 }
 
-func (this RedisStorage) Get(key interface{}) (interface{}, error) {
+func (this RedisStorage) Get(key Key) (interface{}, error) {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (this RedisStorage) Get(key interface{}) (interface{}, error) {
 
 }
 
-func (this RedisStorage) Set(key interface{}, object interface{}) error {
+func (this RedisStorage) Set(key Key, object interface{}) error {
 	buf, err := this.encoding.Marshal(object)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (this RedisStorage) Set(key interface{}, object interface{}) error {
 	return nil
 }
 
-func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error){
+func (this RedisStorage) MultiGet(keys []Key) (map[Key]interface{}, error){
 	cacheKeys := make([]interface{}, len(keys))
 	for index, key := range keys {
 		cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
@@ -55,7 +55,7 @@ func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface
 	if err != nil {
 		return nil, err
 	}
-	result := make(map[interface{}]interface{})
+	result := make(map[Key]interface{})
 	for i,value :=range values{
 		if value==nil{
 			continue
@@ -69,7 +69,7 @@ func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface
 	return result, nil
 }
 
-func (this RedisStorage) MultiSet(valueMap map[interface{}]interface{}) error{
+func (this RedisStorage) MultiSet(valueMap map[Key]interface{}) error{
 	tempMap:=make(map[string][]byte)
 	for key,value :=range valueMap{
 		buf, err := this.encoding.Marshal(value)
@@ -85,7 +85,7 @@ func (this RedisStorage) MultiSet(valueMap map[interface{}]interface{}) error{
 	return this.client.MultiSet(tempMap)
 }
 
-func (this RedisStorage) Delete(key interface{}) error{
+func (this RedisStorage) Delete(key Key) error{
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return err

@@ -2,7 +2,7 @@ package storage
 
 var MAXLEN=200
 
-func (this MemcachedStorage) Getlimit(key,sinceId,maxId interface{},page,count int)(interface{},error){
+func (this MemcachedStorage) Getlimit(key Key,sinceId,maxId interface{},page,count int)(interface{},error){
 	obj,err:=this.Get(key)
 	if err!=nil{
 		return nil,err
@@ -10,7 +10,7 @@ func (this MemcachedStorage) Getlimit(key,sinceId,maxId interface{},page,count i
 	return Page(obj.(Pagerable),sinceId,maxId,page,count),nil
 }
 
-func (this MemcachedStorage) AddItem(key interface{},item interface{})error{
+func (this MemcachedStorage) AddItem(key Key,item interface{})error{
 	obj,err:=this.Get(key)
 	if err!=nil{
 		return err
@@ -19,7 +19,7 @@ func (this MemcachedStorage) AddItem(key interface{},item interface{})error{
 	return this.Set(key,result)
 }
 
-func (this MemcachedStorage) DeleteItem(key interface{},item interface{})error{
+func (this MemcachedStorage) DeleteItem(key Key,item interface{})error{
 	obj,err:=this.Get(key)
 	if err!=nil{
 		return err

@@ -8,9 +8,9 @@ import (
 func TestIncrDecrRedis(t *testing.T) {
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
 	redisStorage,_ := NewRedisStorage(":6379", "test", 0, jsonEncoding)
-	redisStorage.Set("1", 1)
-	res, _ := redisStorage.Get("1")
-	defer redisStorage.Delete("1")
+	redisStorage.Set(String("1"), 1)
+	res, _ := redisStorage.Get(String("1"))
+	defer redisStorage.Delete(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -18,7 +18,7 @@ func TestIncrDecrRedis(t *testing.T) {
 		t.Error("value should be 1")
 	}
 
-	resIncr,_:=redisStorage.Incr("1",1)
+	resIncr,_:=redisStorage.Incr(String("1"),1)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -26,7 +26,7 @@ func TestIncrDecrRedis(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
-	resIncr,_=redisStorage.Incr("1",3)
+	resIncr,_=redisStorage.Incr(String("1"),3)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -34,7 +34,7 @@ func TestIncrDecrRedis(t *testing.T) {
 		t.Error("value should be 5")
 	}
 
-	resDecr,_:=redisStorage.Decr("1",1)
+	resDecr,_:=redisStorage.Decr(String("1"),1)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -42,7 +42,7 @@ func TestIncrDecrRedis(t *testing.T) {
 		t.Error("value should be 4")
 	}
 
-	resDecr,_=redisStorage.Decr("1",2)
+	resDecr,_=redisStorage.Decr(String("1"),2)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -50,7 +50,7 @@ func TestIncrDecrRedis(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
-	resDecr,err:=redisStorage.Decr("2",2)
+	resDecr,err:=redisStorage.Decr(String("2"),2)
 	if err!=nil{
 		t.Error("err should be nil",err)
 	}

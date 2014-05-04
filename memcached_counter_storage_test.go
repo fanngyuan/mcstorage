@@ -8,9 +8,9 @@ import (
 func TestIncrDecr(t *testing.T) {
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
 	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
-	mcStorage.Set("1", 1)
-	res, _ := mcStorage.Get("1")
-	defer mcStorage.Delete("1")
+	mcStorage.Set(String("1"), 1)
+	res, _ := mcStorage.Get(String("1"))
+	defer mcStorage.Delete(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -18,7 +18,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 1")
 	}
 
-	resIncr,_:=mcStorage.Incr("1",1)
+	resIncr,_:=mcStorage.Incr(String("1"),1)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -26,7 +26,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
-	resIncr,_=mcStorage.Incr("1",3)
+	resIncr,_=mcStorage.Incr(String("1"),3)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -34,7 +34,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 5")
 	}
 
-	resDecr,_:=mcStorage.Decr("1",1)
+	resDecr,_:=mcStorage.Decr(String("1"),1)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -42,7 +42,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 4")
 	}
 
-	resDecr,_=mcStorage.Decr("1",2)
+	resDecr,_=mcStorage.Decr(String("1"),2)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -50,7 +50,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
-	resDecr,err:=mcStorage.Decr("2",2)
+	resDecr,err:=mcStorage.Decr(String("2"),2)
 	if err!=nil{
 		t.Error("err should be nil",err)
 	}

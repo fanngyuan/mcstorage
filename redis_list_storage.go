@@ -19,7 +19,7 @@ func NewRedisListStorage(serverUrl string, keyPrefix string, defaultExpireTime i
 	return RedisListStorage{redisStorage,decode},err
 }
 
-func (this RedisListStorage) Get(key interface{}) (interface{}, error) {
+func (this RedisListStorage) Get(key Key) (interface{}, error) {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (this RedisListStorage) Get(key interface{}) (interface{}, error) {
 	return pageData,err
 }
 
-func (this RedisListStorage) Set(key interface{}, object interface{}) error {
+func (this RedisListStorage) Set(key Key, object interface{}) error {
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return err
@@ -40,9 +40,9 @@ func (this RedisListStorage) Set(key interface{}, object interface{}) error {
 	return this.client.Rpush(cacheKey,object)
 }
 
-func (this RedisListStorage) MultiGet(keys []interface{}) (map[interface{}]interface{}, error){
-	result:=make(map[interface{}] interface{})
-	for key :=range keys{
+func (this RedisListStorage) MultiGet(keys []Key) (map[Key]interface{}, error){
+	result:=make(map[Key] interface{})
+	for _,key :=range keys{
 		value,err:=this.Get(key)
 		if err!=nil{
 			continue
@@ -52,7 +52,7 @@ func (this RedisListStorage) MultiGet(keys []interface{}) (map[interface{}]inter
 	return result,nil
 }
 
-func (this RedisListStorage) MultiSet(valueMap map[interface{}]interface{}) error{
+func (this RedisListStorage) MultiSet(valueMap map[Key]interface{}) error{
 	for key,value :=range valueMap{
 		cacheKey,err:=BuildCacheKey(this.KeyPrefix, key)
 		if err!=nil{
@@ -63,7 +63,7 @@ func (this RedisListStorage) MultiSet(valueMap map[interface{}]interface{}) erro
 	return nil
 }
 
-func (this RedisListStorage) Getlimit(key,sinceId,maxId interface{},page,count int)(interface{},error){
+func (this RedisListStorage) Getlimit(key Key,sinceId,maxId interface{},page,count int)(interface{},error){
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (this RedisListStorage) Getlimit(key,sinceId,maxId interface{},page,count i
 	return Page(obj.(Pagerable),sinceId,maxId,page,count),nil
 }
 
-func (this RedisListStorage) AddItem(key interface{},item interface{})error{
+func (this RedisListStorage) AddItem(key Key,item interface{})error{
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return err
@@ -104,7 +104,7 @@ func (this RedisListStorage) AddItem(key interface{},item interface{})error{
 	return this.client.Lpush(cacheKey,item)
 }
 
-func (this RedisListStorage) DeleteItem(key interface{},item interface{})error{
+func (this RedisListStorage) DeleteItem(key Key,item interface{})error{
 	cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
 		return err
