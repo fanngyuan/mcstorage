@@ -57,6 +57,9 @@ func (this RedisStorage) MultiGet(keys []interface{}) (map[interface{}]interface
 	}
 	result := make(map[interface{}]interface{})
 	for i,value :=range values{
+		if value==nil{
+			continue
+		}
 		object,err:=this.encoding.Unmarshal(value.([]byte))
 		if err != nil {
 			continue

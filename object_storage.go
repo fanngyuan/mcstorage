@@ -64,7 +64,7 @@ func NewStorageProxy(prefered, backup Storage) *StorageProxy {
 	}
 }
 
-func (this *StorageProxy) Get(key interface{}) (interface{}, error) {
+func (this StorageProxy) Get(key interface{}) (interface{}, error) {
 	object, err := this.PreferedStorage.Get(key)
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func (this *StorageProxy) Get(key interface{}) (interface{}, error) {
 	return object, nil
 }
 
-func (this *StorageProxy) Set(key interface{}, object interface{}) error {
+func (this StorageProxy) Set(key interface{}, object interface{}) error {
 	if object != nil {
 		err := this.PreferedStorage.Set(key, object)
 		if err != nil {
@@ -95,7 +95,7 @@ func (this *StorageProxy) Set(key interface{}, object interface{}) error {
 	return nil
 }
 
-func (this *StorageProxy) MultiGet(keys []interface{}) (map[interface{}]interface{}, error) {
+func (this StorageProxy) MultiGet(keys []interface{}) (map[interface{}]interface{}, error) {
 	resultMap, err := this.PreferedStorage.MultiGet(keys)
 	if err != nil {
 		return nil, err
@@ -127,7 +127,7 @@ func (this *StorageProxy) MultiGet(keys []interface{}) (map[interface{}]interfac
 	return resultMap, nil
 }
 
-func (this *StorageProxy) MultiSet(objectMap map[interface{}]interface{}) error {
+func (this StorageProxy) MultiSet(objectMap map[interface{}]interface{}) error {
 	err := this.PreferedStorage.MultiSet(objectMap)
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func (this *StorageProxy) MultiSet(objectMap map[interface{}]interface{}) error 
 	return nil
 }
 
-func (this *StorageProxy) Delete(key interface{}) error {
+func (this StorageProxy) Delete(key interface{}) error {
 	err := this.BackupStorage.Delete(key)
 	if err != nil {
 		return err
@@ -151,7 +151,7 @@ func (this *StorageProxy) Delete(key interface{}) error {
 	return nil
 }
 
-func (this *StorageProxy) Incr(key interface{},step uint64)(newValue uint64, err error){
+func (this StorageProxy) Incr(key interface{},step uint64)(newValue uint64, err error){
 	result,err:=this.PreferedStorage.(CounterStorage).Incr(key,step)
 	if err!=nil{
 		return result,err
@@ -163,7 +163,7 @@ func (this *StorageProxy) Incr(key interface{},step uint64)(newValue uint64, err
 	return result,err
 }
 
-func (this *StorageProxy) Decr(key interface{},step uint64)(newValue uint64, err error){
+func (this StorageProxy) Decr(key interface{},step uint64)(newValue uint64, err error){
 	result,err:=this.PreferedStorage.(CounterStorage).Decr(key,step)
 	if err!=nil{
 		return result,err
@@ -175,7 +175,7 @@ func (this *StorageProxy) Decr(key interface{},step uint64)(newValue uint64, err
 	return result,err
 }
 
-func (this *StorageProxy) FlushAll(){
+func (this StorageProxy) FlushAll(){
 	this.PreferedStorage.FlushAll()
 	this.BackupStorage.FlushAll()
 }
