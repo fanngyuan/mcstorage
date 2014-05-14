@@ -10,6 +10,8 @@ type T struct {
 	A int
 }
 
+type TSlice []T
+
 func TestGetSet(t *testing.T) {
 	tt := T{1}
 
@@ -24,6 +26,37 @@ func TestGetSet(t *testing.T) {
 	ttRes := res.(T)
 	if ttRes.A != tt.A {
 		t.Error("res A field is not equals tt field")
+	}
+}
+
+func TestGetSetNil(t *testing.T) {
+	tt := T{1}
+	var tt1 T
+
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	mcStorage.Set(String("1"), tt1)
+	res, _ := mcStorage.Get(String("1"))
+	defer mcStorage.Delete(String("1"))
+	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
+		t.Error("res type is not T")
+	}
+}
+
+func TestGetSetNilSlice(t *testing.T) {
+
+	var nilSlice TSlice
+	jsonEncoding:=JsonEncoding{reflect.TypeOf(&nilSlice)}
+	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	mcStorage.Set(String("1"), nilSlice)
+	res, err := mcStorage.Get(String("1"))
+	defer mcStorage.Delete(String("1"))
+	if res!=nil{
+		t.Error("result should be nil")
+	}
+	if err!=nil{
+		t.Error("result should be nil")
 	}
 }
 

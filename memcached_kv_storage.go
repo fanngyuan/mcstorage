@@ -5,6 +5,7 @@ import (
 	"github.com/fanngyuan/gomemcache/memcache"
 	"reflect"
 	"strings"
+	//"fmt"
 )
 
 type MemcachedStorage struct {
@@ -41,6 +42,15 @@ func (this MemcachedStorage) Get(key Key) (interface{}, error) {
 }
 
 func (this MemcachedStorage) Set(key Key, object interface{}) error {
+	if object==nil{
+		return nil
+	}
+	if reflect.TypeOf(object).Kind()==reflect.Slice{
+		s := reflect.ValueOf(object)
+		if s.Len()==0{
+			return nil
+		}
+	}
 	buf, err := this.encoding.Marshal(object)
 	if err != nil {
 		return err
