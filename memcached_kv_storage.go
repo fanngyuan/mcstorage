@@ -49,7 +49,7 @@ func (this MemcachedStorage) Set(key Key, object interface{}) error {
 	if err != nil {
 		return err
 	}
-	this.client.Set(&memcache.Item{Key: keyCache, Value: buf})
+	this.client.Set(&memcache.Item{Key: keyCache, Value: buf,Expiration:int32(this.DefaultExpireTime)})
 	return nil
 }
 
