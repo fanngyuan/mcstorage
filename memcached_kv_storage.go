@@ -5,7 +5,7 @@ import (
 	"github.com/fanngyuan/gomemcache/memcache"
 	"reflect"
 	"strings"
-	//"fmt"
+//	"fmt"
 )
 
 type MemcachedStorage struct {
@@ -47,7 +47,7 @@ func (this MemcachedStorage) Set(key Key, object interface{}) error {
 	}
 	if reflect.TypeOf(object).Kind()==reflect.Slice{
 		s := reflect.ValueOf(object)
-		if s.Len()==0{
+		if(s.IsNil()){
 			return nil
 		}
 	}
