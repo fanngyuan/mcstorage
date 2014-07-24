@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/fanngyuan/gomemcache/memcache"
+	"github.com/bradfitz/gomemcache/memcache"
 )
 
 func (this MemcachedStorage) Incr(key Key,step uint64)(newValue uint64, err error){

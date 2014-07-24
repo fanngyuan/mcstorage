@@ -2,7 +2,7 @@ package storage
 
 import (
 	"errors"
-	"github.com/fanngyuan/gomemcache/memcache"
+	"github.com/bradfitz/gomemcache/memcache"
 	"reflect"
 	"strings"
 //	"fmt"
