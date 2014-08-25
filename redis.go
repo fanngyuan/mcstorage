@@ -6,6 +6,38 @@ import (
 	"reflect"
 )
 
+type Redis interface{
+
+	Exists(key string) bool
+
+	Lpush(key string,value interface{}) error
+
+	Rpush(key string,value interface{}) error
+
+	Lrange(key string,start,end int)([]interface{}, error)
+
+	Lrem(key string,value interface{},remType int) error
+
+	Brpop(key string,timeoutSecs int) (interface{},error)
+
+	Set(key string,value []byte) error
+
+	Get(key string) ([]byte,error)
+
+	Delete(key string) error
+
+	Incr(key string,step uint64)(int64, error)
+
+	Decr(key string,step uint64)(int64 ,error )
+
+	MultiGet(keys []interface{})([]interface{},error)
+
+	MultiSet(kvMap map[string][]byte) error
+
+	ClearAll() error
+
+}
+
 type RedisClient struct {
 	pool     *redis.Pool
 	addr     string
