@@ -1,15 +1,8 @@
 package storage
 
-import (
-	"github.com/bradfitz/gomemcache/memcache"
-)
-
 func (this MemcachedStorage) Incr(key Key,step uint64)(newValue uint64, err error){
 	keyCache, err := BuildCacheKey(this.KeyPrefix, key)
 	if err != nil {
-		if err == memcache.ErrCacheMiss {
-			return 0, nil
-		}
 		return 0,err
 	}
 	result:=this.client.Increment(keyCache,step,0,0)
