@@ -12,11 +12,11 @@ func (this MemcachedStorage) Incr(key Key,step uint64)(newValue uint64, err erro
 		}
 		return 0,err
 	}
-	result,errcache:=this.client.Increment(keyCache,step)
-	if errcache==memcache.ErrCacheMiss {
-		return 0, nil
+	result:=this.client.Increment(keyCache,step,0,0)
+	if result.Error() != nil{
+		return 0, result.Error()
 	}
-	return result,errcache
+	return result.Count(),nil
 }
 
 func (this MemcachedStorage) Decr(key Key,step uint64)(newValue uint64, err error){
@@ -24,9 +24,12 @@ func (this MemcachedStorage) Decr(key Key,step uint64)(newValue uint64, err erro
 	if err != nil {
 		return 0,err
 	}
-	result,errcache:=this.client.Decrement(keyCache,step)
-	if errcache==memcache.ErrCacheMiss {
-		return 0, nil
+	result:=this.client.Decrement(keyCache,step,0,0)
+	if result.Error() != nil{
+		return 0, result.Error()
 	}
-	return result,errcache
+	return result.Count(),nil
 }
+
+
+

@@ -5,13 +5,15 @@ import (
 	"testing"
 	"github.com/golang/groupcache"
 	"encoding/json"
+	"github.com/dropbox/godropbox/memcache"
 )
 
 func TestGetSetGC(t *testing.T) {
 	tt := T{1}
 
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
 	mcStorage.Set(String("1"), tt)
 	res, _ := mcStorage.Get(String("1"))
 	defer mcStorage.Delete(String("1"))

@@ -1,13 +1,18 @@
 package storage
 
+/**
 import (
 	"reflect"
 	"testing"
+	"github.com/dropbox/godropbox/memcache"
 )
 
 func TestIncrDecr(t *testing.T) {
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(1)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
+
 	mcStorage.Set(String("1"), 1)
 	res, _ := mcStorage.Get(String("1"))
 	defer mcStorage.Delete(String("1"))
@@ -18,7 +23,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 1")
 	}
 
-	resIncr,_:=mcStorage.Incr(String("1"),1)
+	resIncr,_:=mcStorage.Incr(String("1"),1,1)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -26,7 +31,7 @@ func TestIncrDecr(t *testing.T) {
 		t.Error("value should be 2")
 	}
 
-	resIncr,_=mcStorage.Incr(String("1"),3)
+	resIncr,_=mcStorage.Incr(String("1"),3,2)
 	if reflect.TypeOf(res) != reflect.TypeOf(1) {
 		t.Error("res type is not T")
 	}
@@ -62,3 +67,4 @@ func TestIncrDecr(t *testing.T) {
 	}
 
 }
+*/

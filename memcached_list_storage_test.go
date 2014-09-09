@@ -4,6 +4,7 @@ import (
 	"testing"
 	"reflect"
 	"sort"
+	"github.com/dropbox/godropbox/memcache"
 )
 
 func TestGetLimit(t *testing.T) {
@@ -16,7 +17,9 @@ func TestGetLimit(t *testing.T) {
 	slice:=IntReversedSlice(array)
 
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
 
 	mcStorage.Set(String("1"), slice)
 	result, _ := mcStorage.Getlimit(String("1"),0,0,1,20)
@@ -53,7 +56,10 @@ func TestAddItem(t *testing.T) {
 	sort.Sort(sort.Reverse(sort.IntSlice(array)))
 	slice:=IntReversedSlice(array)
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&slice)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
+
 	mcStorage.Set(String("1"), slice)
 	result, _ := mcStorage.Getlimit(String("1"),0,0,1,20)
 	defer mcStorage.Delete(String("1"))

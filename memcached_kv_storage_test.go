@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"github.com/dropbox/godropbox/memcache"
 )
 
 type T struct {
@@ -16,7 +17,8 @@ func TestGetSet(t *testing.T) {
 	tt := T{1}
 
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
 	mcStorage.Set(String("1"), tt)
 	res, _ := mcStorage.Get(String("1"))
 	defer mcStorage.Delete(String("1"))
@@ -34,7 +36,9 @@ func TestGetSetNil(t *testing.T) {
 	var tt1 T
 
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
+	//mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
 	mcStorage.Set(String("1"), tt1)
 	res, _ := mcStorage.Get(String("1"))
 	defer mcStorage.Delete(String("1"))
@@ -47,7 +51,10 @@ func TestGetSetNilSlice(t *testing.T) {
 
 	var nilSlice TSlice
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&nilSlice)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	//mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
 
 	mcStorage.Set(String("1"), nilSlice)
 	res, err := mcStorage.Get(String("1"))
@@ -63,7 +70,11 @@ func TestGetSetNilSlice(t *testing.T) {
 func TestMultiGetSet(t *testing.T) {
 	tt := T{1}
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	///mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
+
 	valueMap := make(map[Key]interface{})
 	keys := make([]Key, 10)
 	for i := 0; i < 10; i++ {
@@ -91,7 +102,10 @@ func TestMultiGetSet(t *testing.T) {
 func TestGetSetDelete(t *testing.T) {
 	tt := T{1}
 	jsonEncoding:=JsonEncoding{reflect.TypeOf(&tt)}
-	mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	//mcStorage := NewMcStorage([]string{"localhost:12000"}, "test", 0, jsonEncoding)
+	client:=memcache.NewMockClient()
+	mcStorage := NewMcStorage(client, "test", 0, jsonEncoding)
+
 	mcStorage.Set(String("1"), tt)
 	res, _ := mcStorage.Get(String("1"))
 	if reflect.TypeOf(res) != reflect.TypeOf(tt) {
