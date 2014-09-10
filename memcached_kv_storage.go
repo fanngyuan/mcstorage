@@ -83,9 +83,20 @@ func (this MemcachedStorage) MultiGet(keys []Key) (map[Key]interface{}, error) {
 }
 
 func (this MemcachedStorage) MultiSet(objectMap map[Key]interface{}) error {
+	items:=make([]*memcache.Item,0,len(objectMap))
 	for k, v := range objectMap {
-		if err := this.Set(k, v); err != nil {
+		buf, err := this.encoding.Marshal(v)
+		if err != nil {
 			return err
+		}
+		keyCache, err := BuildCacheKey(this.KeyPrefix, k)
+		item:=&memcache.Item{Key: keyCache, Value: buf,Expiration:uint32(this.DefaultExpireTime)}
+		items=append(items,item)
+	}
+	responses:=this.client.SetMulti(items)
+	for _,response := range responses {
+		if response.Error() != nil {
+			return response.Error()
 		}
 	}
 	return nil
