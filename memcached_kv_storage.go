@@ -54,8 +54,8 @@ func (this MemcachedStorage) Set(key Key, object interface{}) error {
 	if err != nil {
 		return err
 	}
-	this.client.Set(&memcache.Item{Key: keyCache, Value: buf,Expiration:uint32(this.DefaultExpireTime)})
-	return nil
+	response:=this.client.Set(&memcache.Item{Key: keyCache, Value: buf,Expiration:uint32(this.DefaultExpireTime)})
+	return response.Error()
 }
 
 func (this MemcachedStorage) MultiGet(keys []Key) (map[Key]interface{}, error) {
@@ -96,8 +96,8 @@ func (this MemcachedStorage) Delete(key Key) error {
 	if err != nil {
 		return err
 	}
-	this.client.Delete(cacheKey)
-	return nil
+	response:=this.client.Delete(cacheKey)
+	return response.Error()
 }
 
 func (this MemcachedStorage) FlushAll() {
