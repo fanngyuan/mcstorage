@@ -59,13 +59,19 @@ func (this MemcachedStorage) Set(key Key, object interface{}) error {
 }
 
 func (this MemcachedStorage) MultiGet(keys []Key) (map[Key]interface{}, error) {
-	cacheKeys := make([]string, len(keys))
-	for index, key := range keys {
+	keyMap := make(map[Key] interface{})
+	for _,key := range keys{
+		keyMap[key]=nil
+	}
+	cacheKeys := make([]string, len(keyMap))
+	i:=0
+	for key, _ := range keyMap {
 		cacheKey, err := BuildCacheKey(this.KeyPrefix, key)
 		if err != nil {
 			return nil, err
 		}
-		cacheKeys[index] = cacheKey
+		cacheKeys[i] = cacheKey
+		i=i+1
 	}
 	itemMap:= this.client.GetMulti(cacheKeys)
 	result := make(map[Key]interface{})

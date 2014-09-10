@@ -13,6 +13,7 @@ type T struct {
 
 type TSlice []T
 
+
 func TestGetSet(t *testing.T) {
 	tt := T{1}
 
