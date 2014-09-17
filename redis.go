@@ -1,50 +1,54 @@
 package storage
 
 import (
-	"github.com/garyburd/redigo/redis"
-	"time"
 	"reflect"
+	"strings"
+	"time"
+
+	"github.com/garyburd/redigo/redis"
 )
 
-type Redis interface{
-
+type Redis interface {
 	Exists(key string) bool
 
-	Lpush(key string,value interface{}) error
+	Lpush(key string, value interface{}) error
 
-	Rpush(key string,value interface{}) error
+	Rpush(key string, value interface{}) error
 
-	Lrange(key string,start,end int)([]interface{}, error)
+	Lrange(key string, start, end int) ([]interface{}, error)
 
-	Lrem(key string,value interface{},remType int) error
+	Lrem(key string, value interface{}, remType int) error
 
-	Brpop(key string,timeoutSecs int) (interface{},error)
+	Brpop(key string, timeoutSecs int) (interface{}, error)
 
-	Set(key string,value []byte) error
+	Set(key string, value []byte) error
 
-	Get(key string) ([]byte,error)
+	Get(key string) ([]byte, error)
 
 	Delete(key string) error
 
-	Incr(key string,step uint64)(int64, error)
+	Incr(key string, step uint64) (int64, error)
 
-	Decr(key string,step uint64)(int64 ,error )
+	Decr(key string, step uint64) (int64, error)
 
-	MultiGet(keys []interface{})([]interface{},error)
+	MultiGet(keys []interface{}) ([]interface{}, error)
 
 	MultiSet(kvMap map[string][]byte) error
 
 	ClearAll() error
 
+	Pub(key string, value interface{}) error
+	Sub(key ...string) ([]string, error)
+	UnSub(key ...string) error
 }
 
 type RedisClient struct {
-	pool     *redis.Pool
-	addr     string
+	pool *redis.Pool
+	addr string
 }
 
 func (rc RedisClient) Exists(key string) bool {
-	conn:=rc.connectInit()
+	conn := rc.connectInit()
 	defer conn.Close()
 	v, err := redis.Bool(conn.Do("EXISTS", key))
 	if err != nil {
@@ -53,143 +57,143 @@ func (rc RedisClient) Exists(key string) bool {
 	return v
 }
 
-func (rc RedisClient) Lpush(key string,value interface{}) error {
-	conn:=rc.connectInit()
+func (rc RedisClient) Lpush(key string, value interface{}) error {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	if reflect.TypeOf(value).Kind()==reflect.Slice{
+	if reflect.TypeOf(value).Kind() == reflect.Slice {
 		s := reflect.ValueOf(value)
-		values:=make([]interface{},s.Len()+1)
-		values[0]=key
-        for i := 1; i <= s.Len(); i++ {
-			values[i]=s.Index(i-1).Interface()
-        }
+		values := make([]interface{}, s.Len()+1)
+		values[0] = key
+		for i := 1; i <= s.Len(); i++ {
+			values[i] = s.Index(i - 1).Interface()
+		}
 		_, err := conn.Do("LPUSH", values...)
 		return err
-	}else{
+	} else {
 		_, err := conn.Do("LPUSH", key, value)
 		return err
 	}
 }
 
-func (rc RedisClient) Rpush(key string,value interface{}) error {
-	conn:=rc.connectInit()
+func (rc RedisClient) Rpush(key string, value interface{}) error {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	if reflect.TypeOf(value).Kind()==reflect.Slice{
+	if reflect.TypeOf(value).Kind() == reflect.Slice {
 		s := reflect.ValueOf(value)
-		values:=make([]interface{},s.Len()+1)
-		values[0]=key
-        for i := 1; i <= s.Len(); i++ {
-			values[i]=s.Index(i-1).Interface()
-        }
+		values := make([]interface{}, s.Len()+1)
+		values[0] = key
+		for i := 1; i <= s.Len(); i++ {
+			values[i] = s.Index(i - 1).Interface()
+		}
 		_, err := conn.Do("RPUSH", values...)
 		return err
-	}else{
+	} else {
 		_, err := conn.Do("RPUSH", key, value)
 		return err
 	}
 }
 
-func (rc RedisClient) Lrange(key string,start,end int)([]interface{}, error) {
-	conn:=rc.connectInit()
+func (rc RedisClient) Lrange(key string, start, end int) ([]interface{}, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	v, err := conn.Do("LRANGE", key, start,end)
-	return v.([]interface{}),err
+	v, err := conn.Do("LRANGE", key, start, end)
+	return v.([]interface{}), err
 }
 
-func (rc RedisClient) Lrem(key string,value interface{},remType int) error {
-	conn:=rc.connectInit()
+func (rc RedisClient) Lrem(key string, value interface{}, remType int) error {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("LREM", key,remType ,value)
+	_, err := conn.Do("LREM", key, remType, value)
 	return err
 }
 
-func (rc RedisClient) Brpop(key string,timeoutSecs int) (interface{},error) {
-	conn:=rc.connectInit()
+func (rc RedisClient) Brpop(key string, timeoutSecs int) (interface{}, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	var val interface{}
 	var err error
-	if timeoutSecs<0{
-		val, err = conn.Do("BRPOP", key,0)
-	}else{
-		val, err = conn.Do("BRPOP", key,timeoutSecs)
+	if timeoutSecs < 0 {
+		val, err = conn.Do("BRPOP", key, 0)
+	} else {
+		val, err = conn.Do("BRPOP", key, timeoutSecs)
 	}
-	values,err:=redis.Values(val,err)
-	if err!=nil{
-		return nil,err
+	values, err := redis.Values(val, err)
+	if err != nil {
+		return nil, err
 	}
-	return string(values[1].([]byte)),err
+	return string(values[1].([]byte)), err
 }
 
-func (rc RedisClient) Set(key string,value []byte) error {
-	conn:=rc.connectInit()
+func (rc RedisClient) Set(key string, value []byte) error {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	_, err := conn.Do("SET", key,value)
+	_, err := conn.Do("SET", key, value)
 	return err
 }
 
-func (rc RedisClient) Get(key string) ([]byte,error) {
-	conn:=rc.connectInit()
+func (rc RedisClient) Get(key string) ([]byte, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	v, err := conn.Do("GET", key)
-	if (err!=nil||v==nil){
-		return nil,err
+	if err != nil || v == nil {
+		return nil, err
 	}
-	return v.([]byte),err
+	return v.([]byte), err
 }
 
 func (rc RedisClient) Delete(key string) error {
-	conn:=rc.connectInit()
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	_, err := conn.Do("DEL", key)
 	return err
 }
 
-func (rc RedisClient) Incr(key string,step uint64)(int64, error) {
-	conn:=rc.connectInit()
+func (rc RedisClient) Incr(key string, step uint64) (int64, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	value, err := conn.Do("INCRBY", key,step)
-	if err!=nil{
-		return 0,nil
+	value, err := conn.Do("INCRBY", key, step)
+	if err != nil {
+		return 0, nil
 	}
-	return value.(int64),err
+	return value.(int64), err
 }
 
-func (rc RedisClient) Decr(key string,step uint64)(int64 ,error ){
-	conn:=rc.connectInit()
+func (rc RedisClient) Decr(key string, step uint64) (int64, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
-	value, err := conn.Do("DECRBY", key,step)
-	if err!=nil{
-		return 0,nil
+	value, err := conn.Do("DECRBY", key, step)
+	if err != nil {
+		return 0, nil
 	}
-	return value.(int64),err
+	return value.(int64), err
 }
 
-func (rc RedisClient) MultiGet(keys []interface{})([]interface{},error){
-	conn:=rc.connectInit()
+func (rc RedisClient) MultiGet(keys []interface{}) ([]interface{}, error) {
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	v, err := conn.Do("MGET", keys...)
-	return v.([]interface{}),err
+	return v.([]interface{}), err
 }
 
 func (rc RedisClient) MultiSet(kvMap map[string][]byte) error {
-	conn:=rc.connectInit()
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	var values []interface{}
-	for key,value :=range(kvMap){
-		values=append(values,key)
-		values=append(values,value)
+	for key, value := range kvMap {
+		values = append(values, key)
+		values = append(values, value)
 	}
 
 	_, err := conn.Do("MSET", values...)
@@ -197,23 +201,49 @@ func (rc RedisClient) MultiSet(kvMap map[string][]byte) error {
 }
 
 func (rc RedisClient) ClearAll() error {
-	conn:=rc.connectInit()
+	conn := rc.connectInit()
 	defer conn.Close()
 
 	_, err := conn.Do("FLUSHALL")
 	return err
 }
 
+func (rc RedisClient) Pub(key string, value interface{}) error {
+	conn := rc.connectInit()
+	defer conn.Close()
+
+	_, err := conn.Do("PUBLISH", key, value)
+	return err
+}
+
+func (rc RedisClient) Sub(keys ...string) ([]string, error) {
+	conn := rc.connectInit()
+	defer conn.Close()
+
+	v, err := conn.Do("SUBSCRIBE", keys)
+	value := string(v.([]interface{})[1].([]byte))
+	values := strings.Split(value[1:len(value)-1], " ")
+	return values, err
+}
+
+func (rc RedisClient) UnSub(keys ...string) error {
+	conn := rc.connectInit()
+	defer conn.Close()
+
+	_, err := conn.Do("UNSUBSCRIBE", keys)
+	return err
+}
+
 func (rc RedisClient) connectInit() redis.Conn {
-	conn:=rc.pool.Get()
+	conn := rc.pool.Get()
 	return conn
 }
 
-func InitClient(addr string) (RedisClient,error) {
+func InitClient(addr string) (RedisClient, error) {
 	pool := &redis.Pool{
-		MaxIdle: 3,
+		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
-		Dial: func () (redis.Conn, error) {
+		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", ":6379")
 			if err != nil {
 				return nil, err
@@ -225,5 +255,5 @@ func InitClient(addr string) (RedisClient,error) {
 			return err
 		},
 	}
-	return RedisClient{pool,addr},nil
+	return RedisClient{pool, addr}, nil
 }
