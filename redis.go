@@ -205,16 +205,29 @@ func (rc RedisClient) ClearAll() error {
 }
 
 func (rc RedisClient) connectInit() redis.Conn {
-	conn:=rc.pool.Get()
+	conn := rc.pool.Get()
 	return conn
 }
+func (rc RedisClient) Ping() bool {
+	conn := rc.connectInit()
+	defer conn.Close()
+	pong, err := conn.Do("PING")
+	if err != nil {
+		// fmt.Println(err)
+		return false
+	}
+	return pong == "PONG"
+}
+func (rc RedisClient) DisConnect() {
+	rc.pool.Close()
+}
 
-func InitClient(addr string) (RedisClient,error) {
+func InitClient(addr string) (RedisClient, error) {
 	pool := &redis.Pool{
-		MaxIdle: 3,
+		MaxIdle:     3,
 		IdleTimeout: 240 * time.Second,
-		Dial: func () (redis.Conn, error) {
-			c, err := redis.Dial("tcp", ":6379")
+		Dial: func() (redis.Conn, error) {
+			c, err := redis.Dial("tcp", addr)
 			if err != nil {
 				return nil, err
 			}
