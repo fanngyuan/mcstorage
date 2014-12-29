@@ -252,9 +252,11 @@ func (rc RedisClient) DisConnect() {
 	rc.pool.Close()
 }
 
-func InitClient(addr string) (RedisClient, error) {
+func InitRedisClient(addr string, MaxActive, MaxIdle int, Wait bool) (RedisClient, error) {
 	pool := &redis.Pool{
-		MaxIdle:     3,
+		Wait:        Wait,
+		MaxActive:   MaxActive,
+		MaxIdle:     MaxIdle,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", addr)
@@ -269,4 +271,8 @@ func InitClient(addr string) (RedisClient, error) {
 		},
 	}
 	return RedisClient{pool, addr}, nil
+}
+
+func InitClient(addr string) (RedisClient, error) {
+	return InitRedisClient(addr, 0, 3, false)
 }
