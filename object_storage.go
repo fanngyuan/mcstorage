@@ -1,9 +1,11 @@
 package storage
 
 import (
-	"encoding/json"
-	"reflect"
 	"bytes"
+	"encoding/gob"
+	"encoding/json"
+	"fmt"
+	"reflect"
 )
 
 type Storage interface {
@@ -15,17 +17,17 @@ type Storage interface {
 	FlushAll()
 }
 
-type CounterStorage interface{
+type CounterStorage interface {
 	Storage
-	Incr(key Key,step uint64)(newValue uint64, err error)
-	Decr(key Key,step uint64)(newValue uint64, err error)
+	Incr(key Key, step uint64) (newValue uint64, err error)
+	Decr(key Key, step uint64) (newValue uint64, err error)
 }
 
-type ListStorage interface{
+type ListStorage interface {
 	Storage
-	Getlimit(key Key,sinceId ,maxId interface{},page ,count int)(interface{},error)
-	AddItem(key Key,item interface{})error
-	DeleteItem(key Key,item interface{})error
+	Getlimit(key Key, sinceId, maxId interface{}, page, count int) (interface{}, error)
+	AddItem(key Key, item interface{}) error
+	DeleteItem(key Key, item interface{}) error
 }
 
 type StorageProxy struct {
@@ -42,16 +44,16 @@ type Key interface {
 	ToString() string
 }
 
-type JsonEncoding struct{
-	T                 reflect.Type
+type JsonEncoding struct {
+	T reflect.Type
 }
 
-func (this JsonEncoding) Marshal(v interface{}) ([]byte, error){
+func (this JsonEncoding) Marshal(v interface{}) ([]byte, error) {
 	buf, err := json.Marshal(v)
-	return buf,err
+	return buf, err
 }
 
-func (this JsonEncoding) Unmarshal(data []byte)(interface{}, error){
+func (this JsonEncoding) Unmarshal(data []byte) (interface{}, error) {
 	tStruct := reflect.New(this.T)
 	dec := json.NewDecoder(bytes.NewBuffer(data))
 	err := dec.Decode(tStruct.Interface())
@@ -61,9 +63,36 @@ func (this JsonEncoding) Unmarshal(data []byte)(interface{}, error){
 	return reflect.Indirect(tStruct.Elem()).Interface(), nil
 }
 
+type GobEncoding struct {
+	T reflect.Type
+}
+
+func (this GobEncoding) Marshal(v interface{}) (data []byte, err error) {
+	var network bytes.Buffer
+	enc := gob.NewEncoder(&network)
+	err = enc.Encode(v)
+	data = network.Bytes()
+	return
+}
+
+func (this GobEncoding) Unmarshal(data []byte) (v interface{}, err error) {
+	var network bytes.Buffer
+	tStruct := reflect.New(this.T)
+	network.Write(data)
+	dec := gob.NewDecoder(&network)
+	err = dec.Decode(tStruct.Interface())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	v = reflect.Indirect(tStruct.Elem()).Interface()
+	return
+}
+
 type String string
 
-func (this String) ToString()string{
+func (this String) ToString() string {
 	return string(this)
 }
 
@@ -161,31 +190,31 @@ func (this StorageProxy) Delete(key Key) error {
 	return nil
 }
 
-func (this StorageProxy) Incr(key Key,step uint64)(newValue uint64, err error){
-	result,err:=this.PreferedStorage.(CounterStorage).Incr(key,step)
-	if err!=nil{
-		return result,err
+func (this StorageProxy) Incr(key Key, step uint64) (newValue uint64, err error) {
+	result, err := this.PreferedStorage.(CounterStorage).Incr(key, step)
+	if err != nil {
+		return result, err
 	}
-	result,err=this.BackupStorage.(CounterStorage).Incr(key,step)
-	if err!=nil{
-		return result,err
+	result, err = this.BackupStorage.(CounterStorage).Incr(key, step)
+	if err != nil {
+		return result, err
 	}
-	return result,err
+	return result, err
 }
 
-func (this StorageProxy) Decr(key Key,step uint64)(newValue uint64, err error){
-	result,err:=this.PreferedStorage.(CounterStorage).Decr(key,step)
-	if err!=nil{
-		return result,err
+func (this StorageProxy) Decr(key Key, step uint64) (newValue uint64, err error) {
+	result, err := this.PreferedStorage.(CounterStorage).Decr(key, step)
+	if err != nil {
+		return result, err
 	}
-	result,err=this.BackupStorage.(CounterStorage).Decr(key,step)
-	if err!=nil{
-		return result,err
+	result, err = this.BackupStorage.(CounterStorage).Decr(key, step)
+	if err != nil {
+		return result, err
 	}
-	return result,err
+	return result, err
 }
 
-func (this StorageProxy) FlushAll(){
+func (this StorageProxy) FlushAll() {
 	this.PreferedStorage.FlushAll()
 	this.BackupStorage.FlushAll()
 }
