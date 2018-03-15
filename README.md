@@ -1,10 +1,10 @@
 mcstorage
 =========
-#Dependences#
-##groupcache##
+# Dependences#
+## groupcache##
 go get -u github.com/golang/groupcache
-##memcached client##
+## memcached client##
 go get -u github.com/bradfitz/gomemcache/memcache
 
-#Examples#
+# Examples #
 Please see the tests.I will add examples recently.
